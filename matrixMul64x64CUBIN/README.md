@@ -1,4 +1,5 @@
 1. Compile cu file to cubin file
+	
 	nvcc -arch=compute_61 -code=sm_61 matrix_kernel.cu -cubin -o matrix_kernel.cubin
 
 2. Using maxas.pl -e ...(or cuobjdump --dump -func func_name cublas.so > maxwell_sgemm_64x64_raggedMn_nt_maxas.sass) to generate maxwell_sgemm_64x64_raggedMn_nt_maxas.sass
