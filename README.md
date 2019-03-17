@@ -1,12 +1,19 @@
 This is a simple demo about how to optimize the gemm on Nvidia gpu platform with using sass level optimization trick.
-Enviroment: Ubuntu 16.04/14.04(other Linux os may be OK)
+Enviroment: 
+
+    Ubuntu 16.04/14.04(other Linux os may be OK)
 
 Software required: 
+
     cuda 8.0
     
     cmake 2.8 or above
     
     perl
+
+Hardware required:
+
+    Nvidia pascal architecture gpu(such as GTX1080/1070, Titan X, Tesla P4/P40/P100)
 
 We first write a cuda-c level code in matrixMul_cuda dir. Firstly, this is a 'NT'(C = A*B, A is a column-majored matrix, B is a row-majored matrix) format doing gemm operation. Secondly, ouput C is 64x64 tile format, input A and B is 64x8 format, and we use 64 cuda threads to do it.
 
