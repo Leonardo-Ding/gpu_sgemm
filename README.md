@@ -2,12 +2,15 @@ This is a simple demo about how to optimize the gemm on Nvidia gpu platform with
 Enviroment: Ubuntu 16.04/14.04(other Linux os may be OK)
 
 Software required: 
-    cuda 8.0 
+    cuda 8.0
+    
     cmake 2.8 or above
+    
     perl
 
 We first write a cuda-c level code in matrixMul_cuda dir. Firstly, this is a 'NT'(C = A*B, A is a column-majored matrix, B is a row-majored matrix) format doing gemm operation. Secondly, ouput C is 64x64 tile format, input A and B is 64x8 format, and we use 64 cuda threads to do it.
-some small tricks are listed as followed:   
+
+Some tricks are listed as followed:   
 1. 8x8 loop unroll technique to bring Instruction Level Parallel gain in our code,
 2. wide 128 load/store instructions to enhance load/store efficiency, 
 3. double buffer trick to remove one unneccesary __syncthreads() in for loop, 
