@@ -1,0 +1,2 @@
+nvcc -arch sm_61 sgemm.cpp -o sgemm -I/usr/local/cuda/include -L/usr/local/cuda/lib64 -lcuda -lcublas
+nvcc -arch sm_61 -cubin sgemm.cu -o sgemm.cubin

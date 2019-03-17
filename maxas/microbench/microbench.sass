@@ -1,0 +1,72 @@
+# Kernel: microbench
+
+// This is a simple micro bench to demonstrate the latency in loading SR_TID.X
+
+<CONSTANT_MAPPING>
+    blockDimX : c[0x0][0x08]
+    blockDimY : c[0x0][0x0c]
+    blockDimZ : c[0x0][0x10]
+    gridDimX  : c[0x0][0x14]
+    gridDimY  : c[0x0][0x18]
+    gridDimZ  : c[0x0][0x1c]
+
+    param_out[0]    : c[0x0][0x140]
+    param_out[1]    : c[0x0][0x144]
+    param_clocks[0] : c[0x0][0x148]
+    param_clocks[1] : c[0x0][0x14c]
+    param_in[0]     : c[0x0][0x150]
+    param_in[1]     : c[0x0][0x154]
+</CONSTANT_MAPPING>
+
+<REGISTER_MAPPING>
+
+     0-1 : out<0-1>
+     2-3 : clocks<0-1>
+     4-5 : in<0-1>
+    6-20 : tid, bid, blockDim, clock1, clock2, result, offset, x
+
+</REGISTER_MAPPING>
+
+// Load in our params (not currently used below)
+--:-:-:-:1      MOV in0, param_in[0];
+--:-:-:-:1      MOV in1, param_in[1];
+
+// Get the first clock value
+--:-:-:-:1      CS2R clock1, SR_CLOCKLO;
+
+// Get the threadId and blockId
+// Set the Read-After-Write dependency barrier 1 and 2
+--:-:1:-:1      S2R tid, SR_TID.X;
+// Add one additional clock stall to allow the barrier time to set prior to next instruction that uses it
+--:-:2:-:2      S2R bid, SR_CTAID.X;
+
+
+// Get the second clock value
+// Wait on the depenedency barriers that were set in the prior instruction
+// Stall 6 to allow CS2R time to complete before next instruction
+// CS2R takes a constant 6 clocks to complete unlike S2R which is a variable 22-44 clocks
+// This stall count does not factor into the time calculation at all
+03:-:-:-:6      CS2R clock2, SR_CLOCKLO;
+
+// Take the difference of clocks
+--:-:-:-:1      IADD clock1, clock2, -clock1;
+
+// Setup our output addresses
+// Stall your pipeline dependencies properly
+// Note using a single XMAD assumes blockDimX and bid are 16 bit values, which is reasonable for this test code
+--:-:-:-:6      XMAD offset, bid, blockDimX, tid;
+
+// LEA is "load effective address"
+// The offset param is shifted left 2 and added to the pointers with 64bit math
+--:-:-:-:6      LEA      clocks0.CC, offset, param_clocks[0],     2;
+--:-:-:-:1      LEA.HI.X clocks1,    offset, param_clocks[1], RZ, 2;
+
+--:-:-:-:6      LEA      out0.CC, offset, param_out[0],     2;
+--:-:-:-:1      LEA.HI.X out1,    offset, param_out[1], RZ, 2;
+
+// Output the results.
+// No stall needed on prior instruction as memory store instructions have a 5 clock delay in picking up register values
+--:-:-:-:1      STG.E [clocks], clock1;
+--:-:-:-:1      STG.E [out],    offset; # use this to return whatever you like to inspect the results
+--:-:-:-:5      EXIT;
+
