@@ -33,4 +33,4 @@ Note: consider this is only a simple demo to show how to optimize gpu code in sa
 3. You must write 128x64, 128x128 or others to have better performance beyond Cublas for large input matrix size, though our code has a better performance than cublas when doing 1024x1024 matrix multiply tested on GTX1080.
 4. Sorry to say our document is not detailed, anybody who interested in this project can contact me.
 
-Finally, thank Scott Gray very much for your wonderful code.
+Finally, thank Scott Gray very much for your wonderful code. And most importantly, great appreciation to my kind friend Alex.Xia who made so much contribution to our project and gave me a lot of help.
