@@ -1,4 +1,4 @@
-This is a simple demo about how to optimize the gemm on Nvidia gpu platform with using sass level optimization trick.
+## This is a simple demo about how to optimize the gemm on Nvidia gpu platform with using sass level optimization trick.
 Enviroment: 
 
     Ubuntu 16.04/14.04(other Linux os may be OK)
